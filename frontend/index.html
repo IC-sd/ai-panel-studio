@@ -48,38 +48,39 @@
 
       <!-- View: Studio -->
       <section id="view-studio" class="view">
-        <div class="studio-topbar">
-          <div class="studio-topic" id="studio-topic">讨论议题</div>
-          <div class="studio-controls">
-            <button class="btn btn-play" id="btn-start" onclick="studio.startDiscussion()" style="display:none">▶ 开始圆桌</button>
-            <button class="btn btn-pause" id="btn-pause" onclick="studio.pauseDiscussion()" style="display:none">⏸ 暂停</button>
-            <button class="btn btn-resume" id="btn-resume" onclick="studio.resumeDiscussion()" style="display:none">▶ 继续</button>
-            <span class="status-badge" id="discussion-status-badge">待开始</span>
-          </div>
-        </div>
-        <div class="roundtable-stage" id="roundtable-stage">
-          <!-- Ambient glow -->
-          <div class="stage-glow"></div>
-          <!-- Central table surface -->
-          <div class="table-surface">
-            <div class="table-ring"></div>
-            <div class="table-center-glow"></div>
-            <!-- Transcript on table -->
-            <div class="table-transcript" id="table-transcript">
-              <div class="transcript-placeholder">🎙 讨论尚未开始...</div>
+        <div class="studio-layout" id="studio-layout">
+          <!-- Left: Expert Panel -->
+          <div class="studio-left">
+            <div class="panel-header">
+              <h3>👥 专家阵容</h3>
+              <div class="discussion-controls" id="discussion-controls">
+                <button class="btn btn-play" id="btn-start" onclick="studio.startDiscussion()" style="display:none">▶ 开始讨论</button>
+                <button class="btn btn-pause" id="btn-pause" onclick="studio.pauseDiscussion()" style="display:none">⏸ 暂停</button>
+                <button class="btn btn-resume" id="btn-resume" onclick="studio.resumeDiscussion()" style="display:none">▶ 继续</button>
+                <span class="status-badge" id="discussion-status-badge">待开始</span>
+              </div>
+            </div>
+            <div class="expert-grid" id="expert-grid"></div>
+            <!-- Consensus & Divergence -->
+            <div class="consensus-panel" id="consensus-panel">
+              <div class="consensus-section">
+                <h4>✅ 共识</h4>
+                <div id="consensus-list" class="consensus-list"></div>
+              </div>
+              <div class="divergence-section">
+                <h4>⚠️ 分歧</h4>
+                <div id="divergence-list" class="consensus-list"></div>
+              </div>
             </div>
           </div>
-          <!-- Expert seats arranged around the table -->
-          <div class="expert-seats" id="expert-seats"></div>
-          <!-- Consensus & divergence floating panels -->
-          <div class="consensus-floating" id="consensus-floating">
-            <div class="cf-section">
-              <div class="cf-header consensus">✅ 共识</div>
-              <div class="cf-list" id="cf-consensus"></div>
+
+          <!-- Right: Transcript -->
+          <div class="studio-right">
+            <div class="panel-header">
+              <h3>📝 现场 Transcript</h3>
             </div>
-            <div class="cf-section">
-              <div class="cf-header divergence">⚠️ 分歧</div>
-              <div class="cf-list" id="cf-divergence"></div>
+            <div class="transcript-area" id="transcript-area">
+              <div class="transcript-placeholder">讨论尚未开始...</div>
             </div>
           </div>
         </div>

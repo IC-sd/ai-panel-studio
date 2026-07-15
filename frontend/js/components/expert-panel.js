@@ -1,4 +1,4 @@
-/* Expert panel — positions seats around the round table. */
+/* Expert panel component. */
 /* global api */
 
 const expertPanelComponent = {
@@ -6,78 +6,55 @@ const expertPanelComponent = {
 
   render(experts) {
     this.currentExperts = experts;
-    const container = document.getElementById('expert-seats');
-    container.innerHTML = '';
+    const grid = document.getElementById('expert-grid');
+    grid.innerHTML = experts.map(e => this._cardHTML(e)).join('');
+  },
 
-    const rect = container.getBoundingClientRect();
-    const cw = rect.width || (window.innerWidth - 240);
-    const ch = rect.height || (window.innerHeight - 60);
+  _cardHTML(expert) {
+    const statusLabels = {
+      standby: '待命中', preparing: '准备发言', ready: '待发言',
+      speaking: '发言中', done: '已发言',
+    };
+    const color = expert.color_identity || '#6366f1';
 
-    const cx = cw / 2;
-    const cy = ch * 0.42;
-
-    const maxBottom = ch - 40;
-    const hostAngle = -Math.PI / 2;
-    const maxRyByBottom = (maxBottom - cy) / Math.sin(Math.PI * 0.72);
-
-    const rx = Math.min(cw * 0.43, 360);
-    const ry = Math.min(Math.max(ch * 0.35, 200), maxRyByBottom, rx * 0.75);
-
-    const n = experts.length;
-    const hostIdx = experts.findIndex(e => e.role === 'host');
-
-    experts.forEach((expert, i) => {
-      let angle;
-        if (hostIdx >= 0 && n > 1) {
-          if (i === hostIdx) {
-            angle = hostAngle;
-          } else {
-            const others = experts.filter((_, j) => j !== hostIdx);
-            const otherIdx = others.indexOf(expert);
-            const totalOthers = others.length;
-            const arcStart = -Math.PI * 0.72;
-            const arcEnd = Math.PI * 0.72;
-            const step = totalOthers > 1 ? (arcEnd - arcStart) / (totalOthers - 1) : 0;
-            angle = arcStart + step * otherIdx;
-          }
-        } else {
-          angle = -Math.PI * 0.75 + (Math.PI * 1.5 * i) / Math.max(n, 1);
-        }
-
-        const x = cx + rx * Math.cos(angle);
-        const y = Math.max(50, Math.min(ch - 50, cy + ry * Math.sin(angle)));
-
-        const seat = document.createElement('div');
-      seat.className = `expert-seat ${expert.status}`;
-      if (expert.role === 'host') seat.classList.add('host-role');
-      seat.style.cssText = `left:${x}px;top:${y}px;--seat-color:${expert.color_identity || '#818cf8'}`;
-      seat.dataset.expertId = expert.id;
-
-      seat.innerHTML = `
-        <div class="seat-circle">${expert.avatar_emoji || '🧑'}</div>
-        <div class="seat-label">${this._escape(expert.name)}</div>
-        <div class="seat-role">${expert.role === 'host' ? '🎙 主持人' : this._escape(expert.field)}</div>
-        <div class="seat-focus">${expert.focus_point ? this._escape(expert.focus_point) : ''}</div>
-      `;
-      container.appendChild(seat);
-    });
+    return `<div class="expert-card status-${expert.status}" style="--expert-color:${color}">
+      <div class="expert-avatar">
+        <div class="avatar-emoji" style="background:${color}22">${expert.avatar_emoji || '🧑'}</div>
+        <div>
+          <div class="expert-name">${this._escape(expert.name)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${this._escape(expert.occupation)}</div>
+        </div>
+        ${expert.role === 'host' ? '<span class="expert-role-badge">🎙 主持人</span>' : ''}
+      </div>
+      <div class="expert-title">${this._escape(expert.title)}</div>
+      <div class="expert-field">📌 ${this._escape(expert.field)}</div>
+      <div class="expert-tags">
+        ${(expert.persona_tags || []).map(t => `<span class="expert-tag">${this._escape(t)}</span>`).join('')}
+      </div>
+      <div class="expert-status-line">
+        <span class="status-indicator ${expert.status}"></span>
+        <span>${statusLabels[expert.status] || '待命中'}</span>
+        ${expert.focus_point ? `<span style="color:var(--text-muted);margin-left:auto;font-size:11px">${this._escape(expert.focus_point)}</span>` : ''}
+      </div>
+    </div>`;
   },
 
   updateExpertStatus(data) {
-    const { expert_id, status, focus_point } = data;
+    const { expert_id, status, focus_point, public_thought } = data;
     const expert = this.currentExperts.find(e => e.id === expert_id);
     if (!expert) return;
 
-    if (status) expert.status = status;
+    expert.status = status || expert.status;
     if (focus_point !== undefined) expert.focus_point = focus_point;
+    if (public_thought !== undefined) expert.public_thought = public_thought;
 
-    const seat = document.querySelector(`.expert-seat[data-expert-id="${expert_id}"]`);
-    if (!seat) return;
-
-    seat.className = `expert-seat ${expert.status}`;
-    if (expert.role === 'host') seat.classList.add('host-role');
-    const focusEl = seat.querySelector('.seat-focus');
-    if (focusEl) focusEl.textContent = expert.focus_point || '';
+    // Update the card in DOM
+    const grid = document.getElementById('expert-grid');
+    const cards = grid.querySelectorAll('.expert-card');
+    const idx = this.currentExperts.indexOf(expert);
+    if (idx >= 0 && cards[idx]) {
+      cards[idx].outerHTML = this._cardHTML(expert);
+    }
   },
 
   _escape(str) {
