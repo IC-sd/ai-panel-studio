@@ -1,4 +1,4 @@
-/* Expert panel — renders experts in a flex row with arc transforms. */
+/* Expert panel — renders experts in a horizontal arc. */
 
 const expertPanelComponent = {
   currentExperts: [],
@@ -9,28 +9,21 @@ const expertPanelComponent = {
     container.innerHTML = '';
     if (!experts || experts.length === 0) return;
 
-    // Sort: host first, then by speech_order
+    // Sort: host first, then others
     const sorted = [...experts].sort((a, b) => {
       if (a.role === 'host') return -1;
       if (b.role === 'host') return 1;
       return a.speech_order - b.speech_order;
     });
 
-    const n = sorted.length;
-
-    sorted.forEach((expert, i) => {
-      // Calculate angle along a sine curve: center lowest, edges higher
-      // Normalize i to [-1, 1] range
-      const t = n > 1 ? (i / (n - 1)) * 2 - 1 : 0; // -1 to 1
-      const arcAngle = t * 18; // degrees of tilt
-      const yOffset = -Math.abs(t) * 14; // center experts sit lower (closer to table)
-
+    sorted.forEach(expert => {
       const div = document.createElement('div');
       div.className = `arc-expert ${expert.status}`;
       if (expert.role === 'host') div.classList.add('host');
       div.style.setProperty('--exp-color', expert.color_identity || '#818cf8');
       div.dataset.expertId = expert.id;
-      div.style.transform = `rotate(${arcAngle}deg) translateY(${yOffset}px)`;
+
+      const statusLabels = { standby: '待命', preparing: '准备中', ready: '待发言', speaking: '发言中', done: '已发言' };
 
       div.innerHTML = `
         <div class="arc-avatar">${expert.avatar_emoji || '🧑'}</div>
