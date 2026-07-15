@@ -333,54 +333,98 @@ html, body {
 .status-badge.paused { background: rgba(248,113,113,0.15); color: var(--danger); }
 .status-badge.completed { background: rgba(160,160,184,0.15); color: var(--text-secondary); }
 
-/* === Roundtable layout === */
+/* === Roundtable === */
 .roundtable {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: radial-gradient(ellipse at 50% 30%, #141428 0%, #0a0a14 100%);
-  padding: 16px 24px;
-  gap: 12px;
+  position: relative;
+  padding: 20px 32px;
+  gap: 0;
+  /* Table surface — warm dark wood gradient */
+  background:
+    radial-gradient(ellipse at 50% 65%, #1e1830 0%, #15122a 40%, #0e0c1e 70%, #08070f 100%);
 }
 
-/* === Experts Arc (horizontal row) === */
+/* Table rim — real visible HTML element for the round table surface */
+.table-rim {
+  position: absolute;
+  top: 2%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50% 50% 50% 50% / 38% 38% 62% 62%;
+  background: linear-gradient(
+    180deg,
+    rgba(50,40,85,0.35) 0%,
+    rgba(35,28,65,0.3) 30%,
+    rgba(22,18,45,0.25) 60%,
+    rgba(12,10,28,0.2) 100%
+  );
+  border: 3px solid rgba(160,140,250,0.6);
+  box-shadow:
+    0 0 100px rgba(100,80,200,0.12),
+    inset 0 0 80px rgba(100,80,200,0.06),
+    /* Light reflection at the top edge */
+    inset 0 3px 0 rgba(180,160,255,0.15);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Table top subtle highlight */
+.roundtable::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 5%;
+  right: 5%;
+  height: 50%;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: radial-gradient(ellipse at 50% 100%, rgba(160,140,240,0.03), transparent 70%);
+  pointer-events: none;
+}
+
+/* === Experts Arc — sitting around the table === */
 .experts-arc {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 16px;
+  gap: 20px;
   flex-shrink: 0;
-  padding: 8px 0;
-  min-height: 100px;
+  padding: 4px 0 12px;
+  min-height: 96px;
+  position: relative;
+  z-index: 2;
 }
 
 .arc-expert {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   text-align: center;
   transition: all 0.3s ease;
-  width: 120px;
+  width: 100px;
 }
 
+/* Avatar circle — brighter, more visible */
 .arc-expert .arc-avatar {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 20px;
   background: var(--exp-color, var(--accent));
-  opacity: 0.25;
+  opacity: 0.3;
   border: 2px solid var(--exp-color, var(--accent));
   transition: all 0.3s ease;
   position: relative;
 }
 
-/* Glow ring */
+/* Glow ring on speak */
 .arc-expert .arc-avatar::after {
   content: '';
   position: absolute;
@@ -391,33 +435,30 @@ html, body {
   transition: all 0.3s ease;
 }
 
-/* Speaking state — glow */
 .arc-expert.speaking .arc-avatar {
-  opacity: 0.4;
+  opacity: 0.45;
   box-shadow: 0 0 24px var(--exp-color, var(--accent));
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 .arc-expert.speaking .arc-avatar::after {
   opacity: 1;
   animation: ringPulse 1.5s ease-out infinite;
 }
 
-/* Preparing state */
 .arc-expert.preparing .arc-avatar {
-  opacity: 0.3;
-  box-shadow: 0 0 12px var(--warning);
+  opacity: 0.35;
+  box-shadow: 0 0 14px var(--warning);
   border-color: var(--warning);
 }
 
-/* Host — slightly larger */
 .arc-expert.host .arc-avatar {
-  width: 54px;
-  height: 54px;
-  font-size: 24px;
+  width: 52px;
+  height: 52px;
+  font-size: 22px;
 }
 
 .arc-expert .arc-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -426,15 +467,15 @@ html, body {
 .arc-expert .arc-title {
   font-size: 10px;
   color: var(--text-muted);
-  max-width: 110px;
+  max-width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .arc-expert .arc-host-badge {
-  font-size: 10px;
-  padding: 1px 8px;
+  font-size: 9px;
+  padding: 1px 7px;
   border-radius: 8px;
   background: rgba(129,140,248,0.15);
   color: var(--accent);
@@ -445,37 +486,38 @@ html, body {
   100% { transform: scale(1.5); opacity: 0; }
 }
 
-/* === Table Area (transcript on table surface) === */
+/* === Table Area === */
 .table-area {
   flex: 1;
   position: relative;
-  border-radius: 16px;
-  background: radial-gradient(ellipse at 50% 50%, #1a1a38, #12122a 70%, #0e0e20);
-  border: 1px solid rgba(129,140,248,0.12);
-  overflow: hidden;
+  z-index: 2;
   min-height: 0;
   display: flex;
   flex-direction: column;
+  border-radius: 12px;
+  background: rgba(10,8,20,0.3);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(160,130,220,0.06);
+  margin: 0 8px;
 }
 
-/* Subtle table-top glow */
 .table-glow {
   position: absolute;
   top: 50%; left: 50%;
-  width: 300px; height: 300px;
+  width: 200px; height: 200px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(129,140,248,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(129,140,248,0.04) 0%, transparent 70%);
   pointer-events: none;
 }
 
 .transcript-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 24px;
+  padding: 14px 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   position: relative;
   z-index: 1;
   scroll-behavior: smooth;
@@ -487,15 +529,15 @@ html, body {
   justify-content: center;
   height: 100%;
   color: var(--text-muted);
-  font-size: 15px;
+  font-size: 14px;
 }
 
-/* Transcript entries */
+/* Chat bubbles on table */
 .transcript-scroll .transcript-entry {
   animation: fadeSlideIn 0.3s ease;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  background: rgba(15,15,26,0.5);
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(12,10,24,0.5);
   backdrop-filter: blur(4px);
   border-left: 3px solid var(--entry-color, var(--accent));
 }
@@ -503,68 +545,64 @@ html, body {
 .transcript-scroll .entry-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
+  margin-bottom: 3px;
 }
-
 .transcript-scroll .entry-speaker {
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--entry-color, var(--accent));
 }
-
 .transcript-scroll .entry-title {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
 }
-
 .transcript-scroll .entry-content {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-primary);
-  line-height: 1.7;
+  line-height: 1.6;
 }
-
 .transcript-scroll .entry-time {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 1px;
 }
-
 .transcript-scroll .entry-summary {
   border-top: 1px solid var(--border);
-  padding-top: 12px;
-  margin-top: 8px;
+  padding-top: 10px;
+  margin-top: 6px;
 }
 .transcript-scroll .entry-summary .entry-speaker {
   color: var(--accent);
-  font-size: 14px;
+  font-size: 13px;
 }
-
 .transcript-scroll .entry-system .entry-content {
   color: var(--text-muted);
   font-style: italic;
 }
 
-/* === Summary Bar (consensus + divergence) === */
+/* === Summary Bar === */
 .summary-bar {
   display: flex;
   gap: 16px;
   flex-shrink: 0;
-  padding: 8px 0;
+  padding: 10px 8px 2px;
+  position: relative;
+  z-index: 2;
 }
 
 .summary-col {
   flex: 1;
-  background: rgba(15,15,26,0.6);
+  background: rgba(10,8,20,0.4);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  border-radius: 8px;
+  padding: 8px 12px;
 }
 
 .summary-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .summary-title.consensus { color: var(--success); }
 .summary-title.divergence { color: var(--danger); }
@@ -572,19 +610,17 @@ html, body {
 .summary-items {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  min-height: 20px;
+  gap: 2px;
+  min-height: 18px;
 }
-
 .summary-items .summary-item {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
   line-height: 1.5;
   animation: fadeSlideIn 0.3s ease;
 }
-
 .summary-items .summary-empty {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
 }
 
@@ -709,8 +745,9 @@ html, body {
 
 /* === Responsive === */
 @media (max-width: 1000px) {
-  .arc-expert { width: 100px; }
-  .arc-expert .arc-name { font-size: 12px; }
+  .roundtable { padding: 16px 20px; }
+  .arc-expert { width: 80px; gap: 2px; }
+  .arc-expert .arc-name { font-size: 11px; }
   .summary-bar { flex-direction: column; gap: 8px; }
 }
 
