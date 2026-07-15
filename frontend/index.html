@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Panel Studio — AI圆桌讨论</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- App Shell -->
+  <div id="app">
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">🎙️ AI Panel Studio</h1>
+        <p class="subtitle">AI 圆桌讨论</p>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="home" onclick="app.navigate('home')">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">讨论列表</span>
+        </a>
+        <a href="#" class="nav-item" data-view="studio" onclick="app.navigate('studio')" id="nav-studio" style="display:none">
+          <span class="nav-icon">🎬</span>
+          <span class="nav-label">演播厅</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="connection-status" id="connection-status">
+          <span class="status-dot disconnected"></span>
+          <span>未连接</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content">
+      <!-- View: Home -->
+      <section id="view-home" class="view active">
+        <div class="view-header">
+          <h2>📋 讨论列表</h2>
+          <button class="btn btn-primary" onclick="app.showCreateDialog()">+ 新建讨论</button>
+        </div>
+        <div class="discussion-list" id="discussion-list">
+          <div class="loading">加载中...</div>
+        </div>
+      </section>
+
+      <!-- View: Studio -->
+      <section id="view-studio" class="view">
+        <div class="studio-layout" id="studio-layout">
+          <!-- Left: Expert Panel -->
+          <div class="studio-left">
+            <div class="panel-header">
+              <h3>👥 专家阵容</h3>
+              <div class="discussion-controls" id="discussion-controls">
+                <button class="btn btn-play" id="btn-start" onclick="studio.startDiscussion()" style="display:none">▶ 开始讨论</button>
+                <button class="btn btn-pause" id="btn-pause" onclick="studio.pauseDiscussion()" style="display:none">⏸ 暂停</button>
+                <button class="btn btn-resume" id="btn-resume" onclick="studio.resumeDiscussion()" style="display:none">▶ 继续</button>
+                <span class="status-badge" id="discussion-status-badge">待开始</span>
+              </div>
+            </div>
+            <div class="expert-grid" id="expert-grid"></div>
+            <!-- Consensus & Divergence -->
+            <div class="consensus-panel" id="consensus-panel">
+              <div class="consensus-section">
+                <h4>✅ 共识</h4>
+                <div id="consensus-list" class="consensus-list"></div>
+              </div>
+              <div class="divergence-section">
+                <h4>⚠️ 分歧</h4>
+                <div id="divergence-list" class="consensus-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Transcript -->
+          <div class="studio-right">
+            <div class="panel-header">
+              <h3>📝 现场 Transcript</h3>
+            </div>
+            <div class="transcript-area" id="transcript-area">
+              <div class="transcript-placeholder">讨论尚未开始...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Create Discussion Dialog -->
+  <div id="dialog-overlay" class="dialog-overlay" style="display:none">
+    <div class="dialog">
+      <h3>🚀 新建圆桌讨论</h3>
+      <div class="dialog-body">
+        <div class="form-group">
+          <label for="topic-input">讨论议题</label>
+          <textarea id="topic-input" rows="3" placeholder="请输入讨论议题，例如：AI 是否会在未来十年取代大部分人类工作？"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="expert-count">专家人数</label>
+          <div class="count-selector">
+            <button onclick="app.decrementExpertCount()">−</button>
+            <span id="expert-count-display">4</span>
+            <button onclick="app.incrementExpertCount()">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button class="btn btn-ghost" onclick="app.hideCreateDialog()">取消</button>
+        <button class="btn btn-primary" id="btn-create-discussion" onclick="app.createDiscussion()">✨ 生成专家阵容</button>
+      </div>
+      <div class="dialog-error" id="dialog-error" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/sse-client.js"></script>
+  <script src="/js/components/home.js"></script>
+  <script src="/js/components/studio.js"></script>
+  <script src="/js/components/expert-panel.js"></script>
+  <script src="/js/components/consensus.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
