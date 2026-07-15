@@ -1,31 +1,32 @@
-/* Consensus component — renders summary items. */
+/* Consensus & divergence component. */
+/* global api */
 
 const consensusComponent = {
   renderConsensus(items) {
-    const container = document.getElementById('summary-consensus');
+    const list = document.getElementById('cf-consensus');
     const consensuses = items.filter(i => i.category === 'consensus');
-    container.innerHTML = consensuses.length === 0
-      ? '<div class="summary-empty">暂无共识</div>'
-      : consensuses.map(c => `<div class="summary-item">${this._escape(c.content)}</div>`).join('');
+    list.innerHTML = consensuses.length === 0
+      ? '<div style="font-size:11px;color:var(--text-muted)">暂无</div>'
+      : consensuses.map(c => `<div class="consensus-item">${this._escape(c.content)}</div>`).join('');
   },
 
   renderDivergence(items) {
-    const container = document.getElementById('summary-divergence');
+    const list = document.getElementById('cf-divergence');
     const divergences = items.filter(i => i.category === 'divergence');
-    container.innerHTML = divergences.length === 0
-      ? '<div class="summary-empty">暂无分歧</div>'
-      : divergences.map(d => `<div class="summary-item">${this._escape(d.content)}</div>`).join('');
+    list.innerHTML = divergences.length === 0
+      ? '<div style="font-size:11px;color:var(--text-muted)">暂无</div>'
+      : divergences.map(d => `<div class="consensus-item">${this._escape(d.content)}</div>`).join('');
   },
 
   addConsensusDivergence(item) {
-    const id = item.category === 'consensus' ? 'summary-consensus' : 'summary-divergence';
-    const container = document.getElementById(id);
-    const empty = container.querySelector('.summary-empty');
-    if (empty) empty.remove();
+    const listId = item.category === 'consensus' ? 'cf-consensus' : 'cf-divergence';
+    const list = document.getElementById(listId);
+    const placeholder = list.querySelector('div[style]');
+    if (placeholder) placeholder.remove();
     const el = document.createElement('div');
-    el.className = 'summary-item';
+    el.className = 'consensus-item';
     el.textContent = item.content;
-    container.appendChild(el);
+    list.appendChild(el);
   },
 
   _escape(str) {
