@@ -8,6 +8,7 @@ from typing import AsyncGenerator, Optional
 import httpx
 
 from backend.config import settings
+from backend.services import runtime_config
 
 
 LLM_SYSTEM_PROMPT = """你是一个专业的AI圆桌讨论系统。你的任务是根据用户输入的议题生成专家阵容，并驱动多轮真实的圆桌讨论。
@@ -25,16 +26,32 @@ class LLMService:
     """Service for communicating with the Deepseek API."""
 
     def __init__(self) -> None:
-        self.api_key = settings.deepseek_api_key
         self.api_base = settings.deepseek_api_base.rstrip("/")
         self.model = settings.deepseek_model
         self._client: Optional[httpx.AsyncClient] = None
 
     @property
+    def api_key(self) -> str:
+        """Runtime config takes precedence over .env."""
+        key = runtime_config.get(runtime_config.DEEPSEEK_API_KEY)
+        if key:
+            return key
+        return settings.deepseek_api_key
+
+    @property
+    def active_model(self) -> str:
+        m = runtime_config.get(runtime_config.DEEPSEEK_MODEL)
+        return m if m else settings.deepseek_model
+
+    @property
+    def active_api_base(self) -> str:
+        b = runtime_config.get(runtime_config.DEEPSEEK_API_BASE)
+        return b.rstrip("/") if b else self.api_base
+
+    @property
     def client(self) -> httpx.AsyncClient:
         if self._client is None:
             self._client = httpx.AsyncClient(
-                base_url=self.api_base,
                 timeout=httpx.Timeout(120.0, connect=10.0),
             )
         return self._client
@@ -58,7 +75,7 @@ class LLMService:
         full_messages.extend(messages)
 
         body = {
-            "model": self.model,
+            "model": self.active_model,
             "messages": full_messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
@@ -72,8 +89,9 @@ class LLMService:
 
     async def _sync_chat(self, headers: dict, body: dict) -> str:
         """Non-streaming chat completion."""
+        url = f"{self.active_api_base}/chat/completions"
         response = await self.client.post(
-            "/chat/completions", headers=headers, json=body
+            url, headers=headers, json=body
         )
         response.raise_for_status()
         data = response.json()
@@ -83,8 +101,9 @@ class LLMService:
         self, headers: dict, body: dict
     ) -> AsyncGenerator[str, None]:
         """Streaming chat completion."""
+        url = f"{self.active_api_base}/chat/completions"
         async with self.client.stream(
-            "POST", "/chat/completions", headers=headers, json=body
+            "POST", url, headers=headers, json=body
         ) as response:
             response.raise_for_status()
             async for line in response.aiter_lines():

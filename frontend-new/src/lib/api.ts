@@ -25,4 +25,12 @@ export const api = {
   startDiscussion: (id: string) => req<{ status: string }>(`/discussions/${id}/start`, { method: 'POST' }),
   pauseDiscussion: (id: string) => req<{ status: string }>(`/discussions/${id}/pause`, { method: 'POST' }),
   resumeDiscussion: (id: string) => req<{ status: string }>(`/discussions/${id}/resume`, { method: 'POST' }),
+
+  // Runtime config
+  getConfig: () => req<{ configured_keys: string[] }>('/config'),
+  setConfig: (key: string, value: string) =>
+    req<{ status: string }>('/config', {
+      method: 'POST',
+      body: JSON.stringify({ key, value }),
+    }),
 }

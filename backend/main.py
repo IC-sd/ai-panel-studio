@@ -12,6 +12,7 @@ from backend.database import init_db
 from backend.config import settings
 from backend.api.discussions import router as discussions_router
 from backend.api.streaming import router as streaming_router
+from backend.api.config import router as config_router
 
 app = FastAPI(
     title="AI Panel Studio",
@@ -31,14 +32,33 @@ app.add_middleware(
 # API routes
 app.include_router(discussions_router)
 app.include_router(streaming_router)
+app.include_router(config_router)
 
 # Serve frontend static files — try new React app first, fall back to old
 new_frontend = Path(__file__).resolve().parent.parent / "frontend-new" / "dist"
 old_frontend = Path(__file__).resolve().parent.parent / "frontend"
+frontend_dir = None
 if new_frontend.exists():
-    app.mount("/", StaticFiles(directory=str(new_frontend), html=True), name="frontend")
+    frontend_dir = new_frontend
 elif old_frontend.exists():
-    app.mount("/", StaticFiles(directory=str(old_frontend), html=True), name="frontend")
+    frontend_dir = old_frontend
+
+if frontend_dir:
+    app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+
+
+# Catch-all SPA fallback: serve index.html for unmatched routes
+from starlette.responses import FileResponse
+
+
+@app.exception_handler(404)
+async def spa_fallback(request, exc):
+    if request.url.path.startswith("/api/"):
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+    if frontend_dir:
+        return FileResponse(str(frontend_dir / "index.html"))
+    return JSONResponse({"detail": "Not Found"}, status_code=404)
 
 
 @app.on_event("startup")

@@ -72,16 +72,16 @@ export function HomePage() {
               <div
                 key={d.id}
                 onClick={() => nav(`/studio/${d.id}`)}
-                className="bg-[#222240] border border-[#2e2e50] rounded-xl p-5 cursor-pointer hover:border-[#818cf8] hover:-translate-y-0.5 transition-all"
+                className="bg-[#222240] border border-[#2e2e50] rounded-xl p-5 cursor-pointer hover:border-[#818cf8] hover:-translate-y-0.5 transition-all flex flex-col"
               >
-                <div className="font-semibold mb-2 line-clamp-2">{d.topic}</div>
-                <div className="flex items-center gap-3 text-sm text-[#a0a0b8] mb-3">
+                <div className="font-semibold line-clamp-3 flex-1">{d.topic}</div>
+                <div className="flex items-center gap-3 text-sm text-[#a0a0b8] mt-3 mb-3">
                   <span>👥 {d.expert_count} 位专家</span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[d.status]}`}>
                     {statusLabels[d.status]}
                   </span>
                 </div>
-                <div className="flex justify-between text-xs text-[#6b6b85]">
+                <div className="flex justify-between text-xs text-[#6b6b85] mt-auto pt-2 border-t border-[#2e2e50]/50">
                   <span>🕐 {fmtTime(d.created_at)}</span>
                   {d.host_summary && <span>✅ 已总结</span>}
                 </div>
