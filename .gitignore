@@ -1,8 +1,9 @@
 # Python
 __pycache__/
 *.py[cod]
-*.egg-info/
+# Build output
 dist/
+frontend-new/dist/
 build/
 .venv/
 venv/

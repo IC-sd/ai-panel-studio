@@ -32,10 +32,13 @@ app.add_middleware(
 app.include_router(discussions_router)
 app.include_router(streaming_router)
 
-# Serve frontend static files
-frontend_dir = Path(__file__).resolve().parent.parent / "frontend"
-if frontend_dir.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+# Serve frontend static files — try new React app first, fall back to old
+new_frontend = Path(__file__).resolve().parent.parent / "frontend-new" / "dist"
+old_frontend = Path(__file__).resolve().parent.parent / "frontend"
+if new_frontend.exists():
+    app.mount("/", StaticFiles(directory=str(new_frontend), html=True), name="frontend")
+elif old_frontend.exists():
+    app.mount("/", StaticFiles(directory=str(old_frontend), html=True), name="frontend")
 
 
 @app.on_event("startup")
